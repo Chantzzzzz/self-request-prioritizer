@@ -21,3 +21,7 @@ If defined, only allows a specified number of prioritized self-requests per stre
 ### Self-Request Message
 
 If defined, sets a message on the song request using `!songmsg` with the specifed message to indicate it is a self-request. If undefined, this is skipped.
+
+## Credits/Acknowledgements
+
+Thank you to [Iza](https://github.com/iza-ttv) whose AI Tag Checker extension I based the structure of this action from.

@@ -44,4 +44,4 @@ Triggered by any `!bsr` command in your chat. At a high level, when a request is
 ## Action Info
 Title: `Self-Request Prioritizer`
 Description: `Monitors Beat Saber song requests to see if they're requested by one of the map authors and, if so, moves it to the top of the queue.`
-Version: `1.0.1`
+Version: `1.0.2`

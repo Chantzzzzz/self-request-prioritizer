@@ -18,7 +18,7 @@ const script: Firebot.CustomScript<Params> = {
       name: "Self Request Prioritizer",
       description: "If a map author requests their own map, bump it to the top of the queue",
       author: "Chantzzzzz",
-      version: "1.3",
+      version: "1.5",
       firebotVersion: "5",
     };
   },
@@ -61,6 +61,8 @@ const script: Firebot.CustomScript<Params> = {
 
     const { logger, customVariableManager } = runRequest.modules;
 
+    logger.debug(`==================== Author Self-Request Check ====================`);
+
     const MAX_SELF_REQUESTS_PER_STREAM = runRequest.parameters.selfRequestLimitPerUser;
     const MAX_MAP_AGE_DAYS = runRequest.parameters.selfRequestMaxMapAgeDays;
     const SELF_REQUEST_SONG_MESSAGE = runRequest.parameters.selfRequestSongMessage;
@@ -69,21 +71,23 @@ const script: Firebot.CustomScript<Params> = {
 
     // Set which account we should issue chat commands from, with fallback if desired
     if(CHAT_AS === "Bot" && !runRequest.firebot.accounts.bot.loggedIn) {
+
       if(FALLBACK_TO_STREAMER) {
 
         CHAT_AS = "Streamer";
 
       } else {
 
-        logger.error(`Mapper Self-Request Check is configured to chat as Bot account with no fallback, but bot is not logged in!`);
+        logger.error(`Author Self-Request Check is configured to chat as Bot account with no fallback, but bot is not logged in!`);
 
         return Promise.resolve({
           success: false,
-          errorMessage: `Mapper Self-Request Check is configured to chat as Bot account with no fallback, but bot is not logged in!`,
+          errorMessage: `Author Self-Request Check is configured to chat as Bot account with no fallback, but bot is not logged in!`,
           effects: []
         });
 
       }
+
     }
 
     // Twitch requester username
@@ -94,6 +98,8 @@ const script: Firebot.CustomScript<Params> = {
     
     // BSR code
     const songCode = runRequest.trigger.metadata.userCommand?.args?.[ 0 ];
+
+    logger.debug(`Checking song request ${songCode} from ${requester} for author self-request...`);
 
     return new Promise<ScriptReturnObject>((resolve) => {
 
@@ -111,15 +117,11 @@ const script: Firebot.CustomScript<Params> = {
       }
 
       // assumed to be normalized into lowercase already
-      const mapperLookupDictionary = customVariableManager.getCustomVariable('mapperLookupDictionary', requester) as AuthorLookupDictionary;
+      const authorAliases = customVariableManager.getCustomVariable('authorLookupDictionary', requester) as string[];
 
-      const mapperAliases = mapperLookupDictionary?.[requester];
+      if(!authorAliases) {
 
-      logger.debug(`Checking song request ${songCode} from ${requester} for mapper self-request...`);
-
-      if(!mapperAliases) {
-
-        logger.debug(`Requester ${requester} is not a known mapper - skipping self-request check`);
+        logger.debug(`Requester ${requester} is not a known author - skipping self-request check`);
 
         return resolve({
           success: true,
@@ -172,11 +174,11 @@ const script: Firebot.CustomScript<Params> = {
             authorNames.push(collaborator?.name.toLowerCase());
         });
 
-        const isSelfRequest = authorNames.some((authorName) => mapperAliases.indexOf(authorName) > -1);
+        const isSelfRequest = authorNames.some((authorName) => authorAliases.indexOf(authorName) > -1);
 
         if(!isSelfRequest) {
 
-          logger.debug(`Map ${songCode} requested by known mapper ${requester} but it doesn't look like they're an author`);
+          logger.debug(`Map ${songCode} requested by known author ${requester} but it doesn't look like they're an author on this map`);
 
           return resolve({
             success: true,

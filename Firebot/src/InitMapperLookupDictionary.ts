@@ -2,7 +2,7 @@ import { RunRequest, Firebot, ScriptReturnObject } from "@crowbartools/firebot-c
 import { AuthorLookupDictionary } from "../types/types";
 
 type Params = {
-  mapperDictionaryJsonUrl: string
+  authorDictionaryJsonUrl: string
 }
 
 const script: Firebot.CustomScript<Params> = {
@@ -11,13 +11,13 @@ const script: Firebot.CustomScript<Params> = {
       name: "Initialize Author Lookup Dictionary",
       description: "Fetch the mapping of Twitch usernames to BeatSaver author names and load them into memory",
       author: "Chantzzzzz",
-      version: "1.0",
+      version: "1.1",
       firebotVersion: "5",
     };
   },
   getDefaultParameters: () => {
     return {
-      mapperDictionaryJsonUrl: {
+      authorDictionaryJsonUrl: {
         type: "string",
         default: "https://bso-1.edmontosaurus-fort.ts.net/moppers/mappersMinified.json",
         description: "URL to fetch the dictionary of Twitch usernames to Beat Saver profile names",
@@ -29,10 +29,10 @@ const script: Firebot.CustomScript<Params> = {
 
     const { logger, customVariableManager } = runRequest.modules;
 
-    logger.debug(`Loading author dictionary from ${runRequest.parameters.mapperDictionaryJsonUrl}`);
+    logger.debug(`Loading author dictionary from ${runRequest.parameters.authorDictionaryJsonUrl}`);
 
     return new Promise<ScriptReturnObject>((resolve) => {
-      fetch(runRequest.parameters.mapperDictionaryJsonUrl).then((response) => {
+      fetch(runRequest.parameters.authorDictionaryJsonUrl).then((response) => {
         return response.json();
       }).then((jsonData:AuthorLookupDictionary) => {
 

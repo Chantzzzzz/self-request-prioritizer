@@ -7,6 +7,7 @@ Note that this is using a custom mapping to associate BeatSaver profiles to Twit
 ## Supported Bots
 
 - [Streamer.bot](https://streamer.bot/)
+- [Firebot](https://firebot.app/)
 
 ## Install Instructions
 
@@ -28,4 +29,6 @@ If defined, sets a message on the song request using `!songmsg` with the specife
 
 ## Credits/Acknowledgements
 
-Thank you to [Iza](https://github.com/iza-ttv) whose AI Tag Checker extension I based the structure of this action from.
+Thank you to [Iza](https://github.com/iza-ttv) whose Streamer.bot AI Tag Checker extension I based the structure of this action from.
+
+Thank you to [FEFELAND](https://github.com/FEFELAND) who kindly shared their dictionary of Twitch user to Beat Saver profile users with me.

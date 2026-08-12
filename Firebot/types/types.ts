@@ -33,4 +33,9 @@ export type BeatSaverSongData = {
     blQualified: boolean
 }
 
-export type MapperLookupDictionary = Record<string, string[]>;
+export type AuthorLookupJson = {
+    twitchUserToBeatSaverProfile: Record<string, string>
+    lastUpdated: number
+};
+
+export type AuthorLookupDictionary = Record<string, string[]>;

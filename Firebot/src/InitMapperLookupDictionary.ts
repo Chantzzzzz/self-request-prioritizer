@@ -11,7 +11,7 @@ const script: Firebot.CustomScript<Params> = {
       name: "Initialize Author Lookup Dictionary",
       description: "Fetch the mapping of Twitch usernames to BeatSaver author names and load them into memory",
       author: "Chantzzzzz",
-      version: "1.1",
+      version: "1.2",
       firebotVersion: "5",
     };
   },
@@ -19,7 +19,7 @@ const script: Firebot.CustomScript<Params> = {
     return {
       authorDictionaryJsonUrl: {
         type: "string",
-        default: "https://bso-1.edmontosaurus-fort.ts.net/moppers/mappersMinified.json",
+        default: "https://raw.githubusercontent.com/Chantzzzzz/self-request-prioritizer/refs/heads/main/AuthorData/mappersMinified.json",
         description: "URL to fetch the dictionary of Twitch usernames to Beat Saver profile names",
         title: "Author Lookup Dictionary URL"
       },

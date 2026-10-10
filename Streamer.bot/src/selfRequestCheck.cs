@@ -14,6 +14,7 @@ public class CPHInline
         CPH.TryGetArg("map.uploader.name", out string authorName);
         CPH.TryGetArg("map.id", out string songId);
 
+        // Check map age first to see if the map is too old
         if(maxMapAgeDays > 0) {
             CPH.LogDebug($"Checking age of map against max age of {maxMapAgeDays} days...");
 
@@ -32,43 +33,48 @@ public class CPHInline
         
         CPH.LogDebug($"Checking request of map {songId} by requester {requester}...");
 
-        if(CPH.TryGetArg($"json.twitchUserToBeatSaverProfile.{requester.ToLower()}", out string AuthorAliasesString)) {
+        var AuthorAliases = new List<string>(); 
 
-            CPH.LogDebug($"Requester {requester.ToLower()} is a known mapper - checking song data");
+        // Load any known aliases of the requester...
+        CPH.TryGetArg($"json.twitchUserToBeatSaverProfile.{requester.ToLower()}", out string AuthorAliasesString);
 
-            var AuthorAliases = AuthorAliasesString.Split(',').ToList();
+        if(!string.IsNullOrEmpty(AuthorAliasesString)) {
+            AuthorAliases.AddRange(AuthorAliasesString.Split(',').ToList());
+        }
+        
 
-            if(AuthorAliases.Contains(authorName.ToLower())) {
+        // Add the Twitch username to the possible aliases
+        AuthorAliases.Add(requester.ToLower());
 
-                CPH.LogDebug($"Map {songId} is self-requested (author name is {authorName.ToLower()})");
+        // Check the uploader name first
+        if(AuthorAliases.Contains(authorName.ToLower())) {
 
-                CPH.SetArgument("isSelfRequest", true);
+            CPH.LogDebug($"Map {songId} is self-requested (author name is {authorName.ToLower()})");
 
+            CPH.SetArgument("isSelfRequest", true);
+
+            return true;
+        }
+
+        int maybeCollabIndex = 0;
+
+        // Check through all of the collaborators
+        while(true) {
+            if(CPH.TryGetArg($"map.collaborators[{maybeCollabIndex}].name", out string collabName)) {
+                if(AuthorAliases.Contains(collabName.ToLower())) {
+                    CPH.LogDebug($"Map {songId} is self-requested (Collaborator at index {maybeCollabIndex} has name {collabName.ToLower()})");
+
+                    CPH.SetArgument("isSelfRequest", true);
+
+                    return true;
+                }
+            } else {
                 return true;
             }
 
-            int maybeCollabIndex = 0;
-
-            while(true) {
-                if(CPH.TryGetArg($"map.collaborators[{maybeCollabIndex}].name", out string collabName)) {
-                    if(AuthorAliases.Contains(collabName.ToLower())) {
-                        CPH.LogDebug($"Map {songId} is self-requested (Collaborator at index {maybeCollabIndex} has name {collabName.ToLower()})");
-
-                        CPH.SetArgument("isSelfRequest", true);
-
-                        return true;
-                    }
-                } else {
-                    return true;
-                }
-
-                maybeCollabIndex++;
-            }
-            
+            maybeCollabIndex++;
         }
 
-        
-
-		return true;
 	}
+
 }

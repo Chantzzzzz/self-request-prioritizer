@@ -18,7 +18,7 @@ const script: Firebot.CustomScript<Params> = {
       name: "Self Request Prioritizer",
       description: "If a map author requests their own map, bump it to the top of the queue",
       author: "Chantzzzzz",
-      version: "1.5",
+      version: "1.6",
       firebotVersion: "5",
     };
   },
@@ -116,21 +116,6 @@ const script: Firebot.CustomScript<Params> = {
 
       }
 
-      // assumed to be normalized into lowercase already
-      const authorAliases = customVariableManager.getCustomVariable('authorLookupDictionary', requester) as string[];
-
-      if(!authorAliases) {
-
-        logger.debug(`Requester ${requester} is not a known author - skipping self-request check`);
-
-        return resolve({
-          success: true,
-          errorMessage: '',
-          effects: []
-        });
-
-      }
-
       const selfRequestCount = customVariableManager.getCustomVariable(`selfRequestCount_${requester}`) || 0;
 
       if(MAX_SELF_REQUESTS_PER_STREAM > 0 && selfRequestCount >= MAX_SELF_REQUESTS_PER_STREAM) {
@@ -168,13 +153,22 @@ const script: Firebot.CustomScript<Params> = {
           }
         }
 
+        const requesterAliases = [ requester ] as string[];
+
+        // assumed to be normalized into lowercase already
+        const otherAliases = customVariableManager.getCustomVariable('authorLookupDictionary', requester) as string[];
+
+        if(Array.isArray(otherAliases)) {
+          requesterAliases.push(...otherAliases);
+        }
+
         const authorNames = [ jsonData?.uploader?.name.toLowerCase() ];
 
         jsonData?.collaborators?.forEach((collaborator) => {
             authorNames.push(collaborator?.name.toLowerCase());
         });
 
-        const isSelfRequest = authorNames.some((authorName) => authorAliases.indexOf(authorName) > -1);
+        const isSelfRequest = authorNames.some((authorName) => requesterAliases.indexOf(authorName) > -1);
 
         if(!isSelfRequest) {
 
@@ -223,8 +217,11 @@ const script: Firebot.CustomScript<Params> = {
         } as ScriptReturnObject);
 
       });
+
     });
+
   },
+  
 };
 
 export default script;

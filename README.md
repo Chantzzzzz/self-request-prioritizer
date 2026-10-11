@@ -1,3 +1,7 @@
+# This integration is now deprecated in favour of the general Beat Saber Request Prioritizer!
+
+I won't be maintaining this anymore, and it will just be here for archival purposes. Please see the [new bot integrations here](https://github.com/Chantzzzzz/beat-saber-request-prioritizer).
+
 # Mapper Self-Request Prioritizer
 
 An extension to show the folks who make lovely maps and lightshows a little love by automatically bumping their request in queue if they request their own maps.
